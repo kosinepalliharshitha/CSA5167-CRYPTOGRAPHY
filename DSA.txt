@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void DSA_sign(const unsigned char *message, size_t message_len, unsigned char *signature, size_t *sig_len, unsigned char *k) {
+
+    for (size_t i = 0; i < message_len; i++) {
+        signature[i] = message[i] ^ k[i % *sig_len]; 
+    }
+    *sig_len = message_len;
+}
+
+void RSA_sign(const unsigned char *message, size_t message_len, unsigned char *signature, size_t *sig_len) {
+
+    for (size_t i = 0; i < message_len; i++) {
+        signature[i] = message[i] ^ 0xAA; 
+    }
+    *sig_len = message_len;
+}
+
+void print_signature(const unsigned char *signature, size_t sig_len) {
+    for (size_t i = 0; i < sig_len; i++) {
+        printf("%02x", signature[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    const unsigned char message[] = "This is a test message.";
+    size_t message_len = strlen((const char *)message);
+
+    unsigned char dsa_signature1[256], dsa_signature2[256];
+    unsigned char rsa_signature1[256], rsa_signature2[256];
+    size_t dsa_sig_len1, dsa_sig_len2;
+    size_t rsa_sig_len1, rsa_sig_len2;
+
+    unsigned char k1[256], k2[256]; 
+    for (int i = 0; i < 256; i++) {
+        k1[i] = rand() % 256; 
+        k2[i] = rand() % 256; 
+    }
+
+    DSA_sign(message, message_len, dsa_signature1, &dsa_sig_len1, k1);
+    DSA_sign(message, message_len, dsa_signature2, &dsa_sig_len2, k2);
+
+    RSA_sign(message, message_len, rsa_signature1, &rsa_sig_len1);
+    RSA_sign(message, message_len, rsa_signature2, &rsa_sig_len2);
+
+    printf("DSA Signature 1: ");
+    print_signature(dsa_signature1, dsa_sig_len1);
+    printf("DSA Signature 2: ");
+    print_signature(dsa_signature2, dsa_sig_len2);
+
+    printf("RSA Signature 1: ");
+    print_signature(rsa_signature1, rsa_sig_len1);
+    printf("RSA Signature 2: ");
+    print_signature(rsa_signature2, rsa_sig_len2);
+
+    return 0;
+}
