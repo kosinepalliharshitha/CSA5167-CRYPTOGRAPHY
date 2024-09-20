@@ -1,0 +1,77 @@
+#include <stdio.h>
+
+int gcd(int a, int b) {
+    while (b != 0) {
+        int temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+int extended_gcd(int a, int b, int *x, int *y) {
+    if (a == 0) {
+        *x = 0;
+        *y = 1;
+        return b;
+    }
+
+    int x1, y1;
+    int gcd = extended_gcd(b % a, a, &x1, &y1);
+
+    *x = y1 - (b / a) * x1;
+    *y = x1;
+
+    return gcd;
+}
+
+int mod_inverse(int e, int phi) {
+    int x, y;
+    int g = extended_gcd(e, phi, &x, &y);
+    if (g != 1) {
+        printf("Inverse doesn't exist\n");
+        return -1;
+    } else {
+        int res = (x % phi + phi) % phi;
+        return res;
+    }
+}
+
+int mod_exp(int base, int exp, int mod) {
+    int result = 1;
+    base = base % mod;
+    while (exp > 0) {
+        if (exp % 2 == 1)
+            result = (result * base) % mod;
+        exp = exp >> 1;
+        base = (base * base) % mod;
+    }
+    return result;
+}
+
+int main() {
+    int p = 59, q = 61;
+    int n = p * q; 
+    int phi = (p - 1) * (q - 1); 
+    int e = 31;
+    int d = mod_inverse(e, phi); 
+
+    if (d == -1) {
+        printf("Error finding the private key.\n");
+        return 1;
+    }
+
+    printf("Public Key (e, n): (%d, %d)\n", e, n);
+    printf("Private Key (d, n): (%d, %d)\n", d, n);
+
+    int message = 1234;
+    printf("Original Message: %d\n", message);
+
+    int encrypted = mod_exp(message, e, n);
+    printf("Encrypted Message: %d\n", encrypted);
+
+    int decrypted = mod_exp(encrypted, d, n);
+    printf("Decrypted Message: %d\n", decrypted);
+
+    return 0;
+}
