@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+long long modExp(long long base, long long exp, long long mod) 
+{
+    long long result = 1;
+    while (exp > 0) 
+	{
+        if (exp % 2 == 1)
+            result = (result * base) % mod;
+        exp = exp >> 1;
+        base = (base * base) % mod;
+    }
+    return result;
+}
+int main() 
+{
+    long long q = 23; 
+    long long a = 5;  
+    srand(time(0));
+    long long x = rand() % (q - 1) + 1; 
+    long long y = rand() % (q - 1) + 1; 
+    long long A = modExp(a, x, q); 
+    long long B = modExp(a, y, q); 
+    long long keyAlice = modExp(B, x, q); 
+    long long keyBob = modExp(A, y, q);  
+    printf("Public parameters: q = %lld, a = %lld\n", q, a);
+    printf("Alice's secret number: x = %lld\n", x);
+    printf("Bob's secret number: y = %lld\n", y);
+    printf("Alice sends A = %lld to Bob\n", A);
+    printf("Bob sends B = %lld to Alice\n", B);
+    printf("Shared secret key (Alice's computation): %lld\n", keyAlice);
+    printf("Shared secret key (Bob's computation): %lld\n", keyBob);
+    if (keyAlice == keyBob) 
+	{
+        printf("Key exchange successful! Shared secret key: %lld\n", keyAlice);
+    } else 
+	{
+        printf("Key exchange failed!\n");
+    }
+    return 0;
+}
