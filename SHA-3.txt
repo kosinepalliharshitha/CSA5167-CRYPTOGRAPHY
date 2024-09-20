@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#define NUM_LANES 25
+#define LANE_SIZE 64
+#define STATE_SIZE (NUM_LANES * LANE_SIZE)
+#define CAPACITY_LANES 9  
+#define BLOCK_SIZE 1024   
+#define BLOCK_LANES (BLOCK_SIZE / LANE_SIZE)
+typedef unsigned long long lane_t;
+lane_t randomNonZeroLane() 
+{
+    lane_t lane = 0;
+    while (lane == 0) 
+	{
+        lane = ((lane_t)rand() << 32) | rand();
+    }
+    return lane;
+}
+int allNonZero(lane_t *state) 
+{
+    for (int i = 0; i < CAPACITY_LANES; ++i) 
+	{
+        if (state[i] == 0) 
+		{
+            return 0;
+        }
+    }
+    return 1;
+}
+int main() 
+{
+    srand(time(0));   
+    lane_t state[NUM_LANES] = {0};  
+    lane_t P0[BLOCK_LANES];
+    for (int i = 0; i < BLOCK_LANES; ++i) 
+	{
+        P0[i] = randomNonZeroLane();
+    }
+    int rounds = 0;
+    while (!allNonZero(state)) 
+	{
+        for (int i = 0; i < BLOCK_LANES; ++i) 
+		{
+            state[i] ^= P0[i];
+        }
+        rounds++;
+    }
+    printf("Number of rounds to fill capacity lanes with non-zero bits: %d\n", rounds);
+    return 0;
+}
